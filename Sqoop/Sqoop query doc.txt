@@ -1,0 +1,189 @@
+Run all the below command in general terminal
+
+
+List databases in local host :
+
+============
+
+sqoop list-databases \
+--connect jdbc:mysql://localhost/ \
+--username root \
+--password cloudera
+
+
+===========
+
+
+List tables in database:
+===========
+sqoop list-tables \
+--connect jdbc:mysql://localhost/retail_db \
+--username root \
+--password cloudera
+
+===========
+
+Schema of particular table :
+
+
+===========
+sqoop eval --connect jdbc:mysql://localhost/retail_db --username root --password cloudera --query "describe customers"
+
+===========
+
+
+=============
+
+sqoop import :
+
+============
+
+General:
+
+sqoop import --connect jdbc:mysql://localhost/retail_db --username root --password cloudera --table customers
+
+with Mapper limits:
+
+sqoop import --connect jdbc:mysql://localhost/retail_db --username root --password cloudera --table customers -m2
+
+with target directory:
+
+sqoop import --connect jdbc:mysql://localhost/retail_db --username root --password cloudera --table customers --target-dir /user/cloudera/folder_name
+
+
+Replace the existing directory:
+
+sqoop import --connect jdbc:mysql://localhost/retail_db --username root --password cloudera --table customers --target-dir /user/cloudera/folder_name
+--delete-target-dir
+
+Store data as different file format:
+
+sqoop import --connect jdbc:mysql://localhost/retail_db --username root --password cloudera --table customers --target-dir /user/cloudera/folder_name
+--as-avrodatafile (or) --as-parquetfile (or) --as-sequencefile
+
+* avro - save schema and data(binary form) 
+* parquet - save data in columnar group
+* sequence - save data in binary form
+
+Compression technique:
+
+
+sqoop import --connect jdbc:mysql://localhost/retail_db --username root --password cloudera --table customers --target-dir /user/cloudera/folder_name
+-- compress (default - gz)
+--compression-codec snappy (or) deflate (or) Lz4 (or) bzip2
+
+* gz - average compression size, but non-splitable file (avoided) --fileformat .gz
+* bzip2 - best compression size, but its very slow and very high CPU intense
+* snappy - normal compression size, but its very fast (Recommended)
+* deflate - similar to gz, but its splitable - its not widely supported, coz its error prone
+* lz4 - best among the compression technique
+
+
+
+Conditional imports:
+
+sqoop import --connect jdbc:mysql://localhost/retail_db --username root --password cloudera --table customers --target-dir /user/cloudera/folder_name
+--where "conditions"
+ 
+  * Selective column imports:
+   
+   sqoop import --connect jdbc:mysql://localhost/retail_db --username root --password cloudera --table customers --target-dir /user/cloudera/folder_name
+   --columns "column names" (seperated by , - default)
+   
+   
+  * Using query: (no need to specify the table name as we are using that in query)
+  
+   sqoop import --connect jdbc:mysql://localhost/retail_db --username root --password cloudera --target-dir /user/cloudera/folder_name
+   --query 'select * from table_name where conditions AND $CONDITIONS' --split-by customer_id
+   
+  * Split by:
+  
+    sqoop import --connect jdbc:mysql://localhost/retail_db --username root --password cloudera --table customers --target-dir /user/cloudera/folder_name
+	--split-by column_name(mostly primary key)
+	
+  * Boundary query:
+   
+    sqoop import --connect jdbc:mysql://localhost/retail_db --username root --password cloudera --table customers --target-dir /user/cloudera/folder_name
+	--boundary-query 'select min(XXXXX), max(XXXXX) from table_name where "conditions"' --split-by column_name(mostly primary key)
+	
+	
+  * Delimiter:
+  
+    sqoop import --connect jdbc:mysql://localhost/retail_db --username root --password cloudera --table customers --target-dir /user/cloudera/folder_name
+   --columns "column names"  --fields-terminated-by 'delimeter'
+   
+  
+  * Handling Nulls:
+  
+	sqoop import --connect jdbc:mysql://localhost/retail_db --username root --password cloudera --table table_name --target-dir /user/cloudera/folder_name
+	--null-string "xxx" --null-non-string "yyy"
+	
+
+  * Incremental append:
+  
+   sqoop import --connect jdbc:mysql://localhost/retail_db --username root --password cloudera --table table_name --target-dir /user/cloudera/folder_name
+   --incremental append --check-column 'column_name' --last-value='last_value of that column'
+
+============
+
+
+Sqoop import into Hive:
+
+  sqoop import --connect jdbc:mysql://localhost/retail_db --username root --password cloudera --table table_name --target-dir /user/cloudera/folder_name
+  --hive-import --create-hive-table --hive-database default --hive-table table_name
+
+ 
+ 
+ 22899 , 
+ 
+ 
+ practice 1 :
+ 
+ sqoop import --connect "jdbc:mysql://localhost/retail_db" --username root --password cloudera --table orders --target-dir /user/cloudera/problem1/orders/parquetdata --fields-terminated-by '\t' --where "order_status='COMPLETE'" --as-parquetfile  --null-string "NA" --null-non-string -1 --compress --compression-codec snappy
+ 
+ practice 2 :
+  sqoop import --connect "jdbc:mysql://localhost/retail_db" --username root --password cloudera \
+  --target-dir /user/cloudera/problem1/customers_selected/avrodata \
+  --table customers \
+  --where "customer_state='CA'" \
+  --as-avrodatafile --compress --compression-codec snappy \
+  --columns "customer_id,customer_fname,customer_lname,customer_state"
+  
+  
+  practice 3 :
+  
+   sqoop import --connect "jdbc:mysql://localhost/retail_db" --username root --password cloudera \
+   --table customers \
+   --target-dir /user/cloudera/problem1/customers/textdata \
+   --fields-terminated-by '*' \
+   --where "customer_Street like '%plaza'" \
+   --columns "Customer_id, Customer_fname, Customer_lname, Customer_street" \
+   --lines-terminated-by '|'
+   
+   
+  ======================================**============================================**===================================================== 
+   
+   Create table first in Mysql(any RDBMS) under which we need to export the data
+   
+ Sqoop export :
+ 
+  From HDFS to Mysql:
+    sqoop export --connect "jdbc:mysql://localhost/retail_db --username root --password cloudera \
+	--export-dir /user/cloudera/problem1/customers_selected/avrodata \
+	--table table_name (table should be there in Mysql in which we need to export) \
+	--input-fields-terminated-by '' (need to check the file of HDFS) \
+	--input-null-string 'EMPTY' \
+	--input-null-non-string 0
+	
+	
+  From Hive to Mysql:
+  
+   sqoop export --connect "jdbc:mysql://localhost/retail_db --username root --password cloudera \
+   --table table_name (table should be there in Mysql in which we need to export)
+   --hcatalog-table table_name(in Hive)
+   
+   
+   
+   
+   
+   /user/cloudera/problem1/customers_selected/avrodata

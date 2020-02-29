@@ -1,0 +1,21 @@
+Spark Action :
+
+ collect - its suitable for testing purpose.. if the data is huge, then this would not be recommended
+ 
+ foreach
+ 
+ take (n) - firt n values
+ 
+ first - first value in rdd
+ 
+ count - count the number of elements in RDD
+ 
+ top(values) - defaultly take the first 2 values in descending order
+ 
+ countByValue -  it gives the frequency of the elements occur in rdd
+ 
+ reduce - add all the elements in RDD and give the value
+ 
+ 
+ 
+ 

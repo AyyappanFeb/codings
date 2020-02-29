@@ -1,0 +1,76 @@
+Spark : 
+
+ Spark does not have any storage in it, so it cannot replace Hadoop
+ Spark can be inter-related to any of the sources like HDFS, AWS, yarn, etc..
+
+ Spark core - Spark SQL, Spark streaming, Graphx, MLLib
+ 
+Spark context - short for sc
+
+If we mention sc.  --> it will be submitted to the resource manager, then it will contact --> node manager to create application master,
+                       then application master will interlinked with resource manager to allocate the resources for the completion of jobs
+
+This application master will be the sole responsible for the jobs submitted in spark
+
+
+ sc.textFile(input as text file)
+ sc.parallelize (list of elements)
+ 
+
+
+sc.setLogLevel("WARN") --> it will show less number of logs for the upcoming RDDs
+
+rddname.toDebugString --> gives the DAG info of the above RDDs and also stage info
+
+2 Types of transformation :
+
+ Narrow Transformation - If the data is not shuffled between the executors(nodes), then it's called as Narrow transformation --> stage value (1)
+ Wide Transformation - If the data has been shuffled between the executors(nodes), then it's called as Wide Transformation --> stge value (2)
+ 
+ 
+ 
+
+
+Spark NArrow Transformation :
+
+=====================================
+
+  map(func):
+   
+   rddname.map(x=> x+1) --> all the elements of that RDD will be added with 1
+   rddname.map(x=>x,1) --> all the elements of that RDD will be appear like (value,1)
+   
+  flatMap(func):
+   
+   rddname.flatMap(x=>x.split(','))
+   
+  filter(func):
+  
+   rddname.filter(x=> conditions on x)
+   rddname.filter(x=> x.split(',)(index_value) conditions)
+   
+   intersection():
+   
+    rddname1.intersection(rddname2)
+	
+   distinct():
+   
+    rddname.distinct()
+	
+   union() :
+   
+    rddname1.union(rddname2)
+ 
+
+ ==========================================
+ 
+ 
+ Spark Wide Transformation :
+ 
+  groupByKey():
+  
+   make the file as tuple with the split by function
+   val pairrdd = rddname.map(x=> (x.split(',')(0),x.split(',')(1))
+   val grouprdd = pairrdd.groupByKey()
+   
+   
