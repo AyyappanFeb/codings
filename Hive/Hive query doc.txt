@@ -1,0 +1,141 @@
+Run all the below command in Hive shell
+
+
+Basic database query :
+
+===================
+
+Create Database :
+
+ create database if not exists db_name comment "What this DB about";
+ create database if not exists db_name comment "What this DB about" location 'specify the location where this db should reside';
+ 
+ 
+Describe :
+
+ describe database extended db_name;
+ 
+Drop :
+ 
+  drop database db_name; (if there is no db in it)
+  drop database db_name cascade; (if db is having 1 or more tables in it)
+  
+show :
+
+ show databases like 'aaaa*';
+
+
+=====================
+
+
+Table query : 
+
+
+Create Managed table : (if we didn't mention the type of table.. by default it takes as Managed table)
+
+ CREATE TABLE table_name (column_names seperated by ,)
+ ROW FORMAT DELIMITED
+ 
+ STORED AS TEXTFILE;
+ 
+ 
+ Describe :
+  
+  describe formatted table_name;
+  
+  
+ Load data from HDFS to Hive:
+ 
+  LOAD DATA INPATH 'HDFS path' overwrite into table table_name (in HIVE);
+ 
+ 
+ Drop table :
+ 
+  drop table table_name;
+  
+  
+  
+Create External table:
+
+ create external table table_name (column_names seperated by ,)
+ row format delimited
+ location 'path in HDFS"(optional)
+ 
+ 
+Create AS:
+
+ create table table_name (no need to mention the column names as it is inferring from other tables)
+ stored as TEXTFILE
+ row format delimited
+ as select * from table_name(already exists in DB);
+ 
+ 
+Hive Analytics:
+
+select statement ************************
+
+
+
+
+
+Working with Parquet file :
+
+ create table_name ("column_names seperated by ,)
+ stored as parquet
+ location 'where the data should be/ is resided/ residing in hdfs';
+ 
+ 
+Compressing technique :
+
+ SET hive.exec.compress.output (first set it as true)
+then SET parquet.compression=SNAPPY; or GZIP; (only 2 compression technique is available for parquet file)
+then create table query
+
+
+Working with fixed file format using regular expression :
+
+ create external table table_name (column_names seperated by ,)
+ location 'HDFS path where the file resides'
+ row format 'org.apache.hadoop.hive.serde2.RegexSerDe'
+ with SERDEPROPERTIES("input.regex"="(.{}),(.{})"
+ 
+ 
+ 
+Hive Partitioning :
+
+ SET hive.exec.dynamic.partition = true;
+ SET hive.exec.dynamic.partition.mode = non_strict;
+ 
+
+creating partition table here :
+
+ create table table_name (column_names seperated by ,) - should not specify the partitioned column here
+ ROW FORMAT DELIMITED
+ partitioned by (column_name)
+ 
+Loading the data for the partitioned table :
+
+ Insert overwrite table table_name(partitioned table)
+ partition(partitioned_column)
+ data source (from other tables)
+ 
+ 
+Hive Bucketting :
+
+ SET hive.enforce.buketting=true;
+ 
+ create table table_name (column_names seperated by ,) - should specify all the columns
+ row format delimited
+ fields terminated by ','
+ clustered by (column_name) into 'n' buckets ( 'n' --> our wish)
+ 
+ 
+ 
+ 
+ 
+
+
+ 
+ 
+ 
+ =============================
