@@ -1,0 +1,23 @@
+Flume consist of 4 main things :
+
+Source - which is getting input from external sources and loading into Channel
+Channel - Which ensures the flow of event from source to sink 
+Sink - Which gets the event from the channel and load into the storage device
+Event - The datablocks which flows from souce to sink via channel
+Agent - Combination of souce --> channel --> Sink
+
+only one thing which we need to perform in flume is - 'configuring' (configuration of souce, channel, sink)
+
+There are various types of source, channel and sink
+
+Various types of channel in flume is :
+
+  * Memory channel (non-reliable, fast, widely used, in-memory)
+  * File Channel (very reliable, average, widely used, file-system)
+  * Kafka channel
+  * JDBC Channel
+  * Spillable memory channel
+  * Pseudo transistion channel
+  * Custom channel
+  
+  https://flume.apache.org/releases/content/1.9.0/flumeuserguide.html#kafka-channel
